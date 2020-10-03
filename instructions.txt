@@ -1,0 +1,18 @@
+### Install Tailwind CSS
+npm install tailwindcss
+
+# add tailwind to app - create file resources/css/main.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+# init tailwind config file
+npx tailwindcss init
+
+# add to laravel webpack.mix.js
+mix.js('resources/js/app.js', 'public/js')
+    .postCss('resources/css/main.css', 'public/css', [
+        require('tailwindcss'),
+    ]);
+
+npm run watch
