@@ -8,6 +8,7 @@ use Illuminate\Http\Client\PendingRequest;
 
 class GamesController extends Controller
 {
+    public $apiUrl = 'https://api.igdb.com/v4/games';
     /**
      * Display a listing of the resource.
      *
@@ -20,12 +21,11 @@ class GamesController extends Controller
         ])
             ->withToken(env('IGDB_ACCESS_TOKEN'))
             ->withBody(
-                'fields name, rating;
-        where rating != null;
-        sort rating desc;
-        limit 12;'
-                ,'raw')
-            ->post('https://api.igdb.com/v4/games')->json();
+                'fields *, rating;
+                        where rating != null;
+                        sort rating desc;
+                        limit 12;','raw')
+            ->post($this->apiUrl)->json();
         dd($highestRatedGames);
     }
 
