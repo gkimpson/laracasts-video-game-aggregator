@@ -17,4 +17,9 @@ mix.js('resources/js/app.js', 'public/js')
 
 npm run watch
 
-Current : Episode 2 14:54
+Current : Episode 6 - Fetching API data from IGDB - READ COMMENTS API has changed since now v4
+xfwsy05zb3n8jpy5kr6osv2qw7qqb9xfwsy05zb3n8jpy5kr6osv2qw7qqb9
+yp7gpylesm9ltooceojhzwlg6p26b1
+
+https://api-docs.igdb.com/#authentication
+setup twitch oAuth - get client id/secret
