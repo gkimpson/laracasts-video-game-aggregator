@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\PendingRequest;
@@ -16,17 +17,64 @@ class GamesController extends Controller
      */
     public function index()
     {
-        $highestRatedGames = Http::withHeaders([
+        $before = Carbon::now()->subMonth(2)->timestamp;
+        $after = Carbon::now()->addMonth(2)->timestamp;
+        $current = Carbon::now()->timestamp;
+
+        $highestRatedGames = $this->getHighestRatedGames($before, $after, $current);
+        $recentlyReviewedGames = $this->getRecentlyReviewed($before, $after);
+        $comingSoonGames = $this->getComingSoonGames($current);
+        dump($comingSoonGames);
+
+        return view('index', [
+            'highestRatedGames' => $highestRatedGames,
+            'recentlyReviewedGames' => $recentlyReviewedGames,
+            'comingSoonGames' => $comingSoonGames
+        ]);
+    }
+
+    public function getHighestRatedGames($before, $after, $current) {
+        // gets current gen games
+        return Http::withHeaders([
             'Client-ID' => env('IGDB_CLIENT_ID'),
         ])
             ->withToken(env('IGDB_ACCESS_TOKEN'))
             ->withBody(
-                'fields *, rating;
-                        where rating != null;
+                "fields *, cover.url, first_release_date, platforms.abbreviation, rating;
+                        where rating != null & platforms = (48, 49, 130, 6)
+                        & (first_release_date > {$before} & first_release_date < {$after});
                         sort rating desc;
-                        limit 12;','raw')
+                        limit 10;",'raw')
             ->post($this->apiUrl)->json();
-        dd($highestRatedGames);
+    }
+
+    public function getRecentlyReviewed($before, $current) {
+        return Http::withHeaders([
+            'Client-ID' => env('IGDB_CLIENT_ID'),
+        ])
+            ->withToken(env('IGDB_ACCESS_TOKEN'))
+            ->withBody(
+                "fields *, cover.url, first_release_date, platforms.abbreviation, rating;
+                        where rating != null & platforms = (48, 49, 130, 6)
+                        & rating_count > 10
+                        & (first_release_date > {$before} & first_release_date < {$current});
+                        sort rating desc;
+                        limit 3;",'raw')
+            ->post($this->apiUrl)->json();
+    }
+
+    public function getComingSoonGames($current) {
+        return Http::withHeaders([
+            'Client-ID' => env('IGDB_CLIENT_ID'),
+        ])
+            ->withToken(env('IGDB_ACCESS_TOKEN'))
+            ->withBody(
+                "fields *, cover.url, first_release_date, platforms.abbreviation, rating;
+                        where rating != null & platforms = (48, 49, 130, 6)
+                        & rating_count > 10;
+                        sort first_release_date desc;
+                        limit 3;",'raw')
+            ->post($this->apiUrl)->json();
     }
 
     /**
