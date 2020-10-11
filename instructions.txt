@@ -20,4 +20,4 @@ npm run watch
 https://api-docs.igdb.com/#authentication
 setup twitch oAuth - get client id/secret
 
-Current : Episode 6@9:00 approx - Fetching API data from IGDB - READ COMMENTS API has changed since now v4
+Current : Episode 7 - Improve performance NB Multi-Query in IGDB v4 requires a pro tier account. https://api-docs.igdb.com/#multi-query

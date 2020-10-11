@@ -24,13 +24,33 @@ class GamesController extends Controller
         $highestRatedGames = $this->getHighestRatedGames($before, $after, $current);
         $recentlyReviewedGames = $this->getRecentlyReviewed($before, $after);
         $comingSoonGames = $this->getComingSoonGames($current);
-        dump($comingSoonGames);
+        $multiQuery = $this->getMultiQuery(['b' => $before, 'a' => $after, 'c' => $current]);
+
+        dd($multiQuery);
 
         return view('index', [
             'highestRatedGames' => $highestRatedGames,
             'recentlyReviewedGames' => $recentlyReviewedGames,
             'comingSoonGames' => $comingSoonGames
         ]);
+    }
+    public function getMultiQuery($timestamps) {
+        return Http::withHeaders([
+            'Client-ID' => env('IGDB_CLIENT_ID'),
+        ])
+            ->withToken(env('IGDB_ACCESS_TOKEN'))
+            ->withBody(
+                "
+                    query games \"PopularGames\" {
+                        fields name, rating, platforms.name, first_release_date;
+                        where rating != null & rating > 95 & platforms = (48, 49);
+                        limit 2;
+                    };
+
+
+
+                        ",'text/plain')
+            ->post($this->apiUrl)->json();
     }
 
     public function getHighestRatedGames($before, $after, $current) {
